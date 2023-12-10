@@ -113,6 +113,8 @@
 
         // Funzione per cancellare il prodotto
         function deleteProduct() {
+            const confermaCancellazione = confirm("il prodotto verrá cancellato definitivamente, vuoi procedere?")
+            if(confermaCancellazione){
             fetch(`https://striveschool-api.herokuapp.com/api/product/${productId}`, {
                 method: "DELETE",
                 headers: {
@@ -127,8 +129,12 @@
                 window.location.href = "index.html"
             })
         }
-
+    }
+        
         function resetForm() {
+            const confermaReset = confirm("sei sicuro di voler cancellare i dati dal form?")
+            if(confermaReset) {
+        
     // Resetta tutti i campi del modulo ai valori iniziali
     document.getElementById('name').value = "";
     document.getElementById('description').value = "";
@@ -136,6 +142,7 @@
     document.getElementById('imageUrl').value = "";
     document.getElementById('price').value = "";
 }
+        }
         dettagliProdotto()
     </script>
 </body>
