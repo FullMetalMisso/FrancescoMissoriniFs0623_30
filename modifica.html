@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dettaglio Prodotto</title>
+</head>
+<body>
+    <button onclick="window.location.href='index.html'">Vai alla Home</button>
+    
+    
+    <h1>Dettaglio Prodotto</h1>
+    <div id="dettaglioProdotto"></div>
+
+    <h2>Modifica Prodotto</h2>
+    <form id="modificaForm">
+        <label for="name">Nome:</label>
+        <input type="text" id="name" name="name" required>
+
+        <label for="description">Descrizione:</label>
+        <textarea id="description" name="description" required></textarea>
+
+        <label for="brand">Marca:</label>
+        <input type="text" id="brand" name="brand" required>
+
+        <label for="imageUrl">URL dell'immagine:</label>
+        <input type="text" id="imageUrl" name="imageUrl" required>
+
+        <label for="price">Prezzo:</label>
+        <input type="number" id="price" name="price" required>
+
+        <button type="button" id="modificaButton" onclick="modificaProdotto()">Modifica</button>
+        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="deleteProduct()">Cancella</button>
+        <button type="button" id="resetButton" onclick="resetForm()">Resetta Form</button>
+
+    </form>
+
+    <script>
+        // Ottenere l'ID del prodotto, window.location.search restituisce la parte della stringa di Url
+        const urlParams = new URLSearchParams(window.location.search);
+        const productId = urlParams.get('id');
+
+        // Chiamare la funzione solo quando la pagina è completamente caricata
+        document.addEventListener('DOMContentLoaded', function() {
+            dettagliProdotto();
+        });
+
+        const dettaglioProdottoDiv = document.getElementById('dettaglioProdotto');
+       
+        // chi controlla l'id controlla il mondo
+        // Funzione per ottenere i dettagli del prodotto dal server cercando l'id
+        function dettagliProdotto() {
+            fetch(`https://striveschool-api.herokuapp.com/api/product/${productId}`, {
+                method: "GET",
+                headers: {
+                    "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NTczMWVhMGZlMDMxZTAwMTliYTE2NTMiLCJpYXQiOjE3MDIwNTM2NDIsImV4cCI6MTcwMzI2MzI0Mn0.4u44kcEgazI1VIbqjcADzg_H8S71bqHIlcuemZhYvcY",
+                    "Content-Type": "application/json"
+                }
+            })
+            .then(response => response.json())
+            .then(prodotto => {
+                // Popolare il contenuto della pagina con i dettagli del prodotto
+                dettaglioProdottoDiv.innerHTML = `
+                    <h2>${prodotto.name}</h2>
+                    <p>${prodotto.description}</p>
+                    <img src="${prodotto.imageUrl}" alt="${prodotto.name}" width="300px">
+                    <p>Prezzo: ${prodotto.price}</p>
+                `;
+
+                // Popolare il form di modifica con i valori attuali del prodotto presenti nel server
+                document.getElementById('name').value = prodotto.name;
+                document.getElementById('description').value = prodotto.description;
+                document.getElementById('brand').value = prodotto.brand;
+                document.getElementById('imageUrl').value = prodotto.imageUrl;
+                document.getElementById('price').value = prodotto.price;
+            })
+        }
+
+        // Funzione per modificare il prodotto
+        function modificaProdotto() {
+            // Ottenere i valori aggiornati dal form
+            const updatedName = document.getElementById('name').value;
+            const updatedDescription = document.getElementById('description').value;
+            const updatedBrand = document.getElementById('brand').value;
+            const updatedImageUrl = document.getElementById('imageUrl').value;
+            const updatedPrice = document.getElementById('price').value;
+
+            // Creare l'oggetto con i valori aggiornati
+            const updatedProduct = {
+                name: updatedName,
+                description: updatedDescription,
+                brand: updatedBrand,
+                imageUrl: updatedImageUrl,
+                price: updatedPrice,
+            };
+
+            // Effettuare la richiesta di modifica al server
+            fetch(`https://striveschool-api.herokuapp.com/api/product/${productId}`, {
+                method: "PUT",
+                headers: {
+                    "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NTczMWVhMGZlMDMxZTAwMTliYTE2NTMiLCJpYXQiOjE3MDIwNTM2NDIsImV4cCI6MTcwMzI2MzI0Mn0.4u44kcEgazI1VIbqjcADzg_H8S71bqHIlcuemZhYvcY",
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(updatedProduct),
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log("Prodotto modificato con successo:", data);
+                alert("prodotto modificato")
+                location.reload()
+            })
+        }
+
+        // Funzione per cancellare il prodotto
+        function deleteProduct() {
+            fetch(`https://striveschool-api.herokuapp.com/api/product/${productId}`, {
+                method: "DELETE",
+                headers: {
+                    "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NTczMWVhMGZlMDMxZTAwMTliYTE2NTMiLCJpYXQiOjE3MDIwNTM2NDIsImV4cCI6MTcwMzI2MzI0Mn0.4u44kcEgazI1VIbqjcADzg_H8S71bqHIlcuemZhYvcY",
+                    "Content-Type": "application/json"
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log("Prodotto cancellato con successo:", data);
+                alert("prodotto cancellato")
+                window.location.href = "index.html"
+            })
+        }
+
+        function resetForm() {
+    // Resetta tutti i campi del modulo ai valori iniziali
+    document.getElementById('name').value = "";
+    document.getElementById('description').value = "";
+    document.getElementById('brand').value = "";
+    document.getElementById('imageUrl').value = "";
+    document.getElementById('price').value = "";
+}
+        dettagliProdotto()
+    </script>
+</body>
+</html>
